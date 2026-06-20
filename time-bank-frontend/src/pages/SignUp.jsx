@@ -9,7 +9,7 @@ const Signup = ({ onSignupSuccess }) => {
     category: "",
     role: "",
     reason: "",
-    password: "", // <-- backend expects password
+    password: "",
   });
 
   const [error, setError] = useState("");
@@ -17,12 +17,12 @@ const Signup = ({ onSignupSuccess }) => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    // Simple validation
     for (let key in form) {
       if (form[key] === "") {
         setError("All fields are required");
@@ -41,11 +41,12 @@ const Signup = ({ onSignupSuccess }) => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signup", { // ✅ fixed URL
+      const res = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
       const data = await res.json();
 
       if (!res.ok) {
@@ -53,35 +54,69 @@ const Signup = ({ onSignupSuccess }) => {
         return;
       }
 
-      // Store backend user object with token and _id
       localStorage.setItem("currentUser", JSON.stringify(data));
 
       setError("");
+
       if (onSignupSuccess) onSignupSuccess(data);
     } catch (err) {
       setError("Server error: " + err.message);
     }
   };
 
+  const requiredStyle = {
+    color: "#b41a1aff",
+    marginLeft: "2px",
+  };
+
   return (
     <div className="auth-container">
       <h2>Create Account</h2>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form className="auth-form" onSubmit={handleSignup}>
-        <input name="name" placeholder="Full Name" onChange={handleChange} />
+
+        <label>
+          Full Name <span style={requiredStyle}>*</span>
+        </label>
+        <input
+          name="name"
+          placeholder="Full Name"
+          onChange={handleChange}
+        />
+
+        <label>
+          Age <span style={requiredStyle}>*</span>
+        </label>
         <input
           name="age"
           type="number"
           placeholder="Age"
           onChange={handleChange}
         />
-        <input name="email" placeholder="Email" onChange={handleChange} />
+
+        <label>
+          Email <span style={requiredStyle}>*</span>
+        </label>
+        <input
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+        />
+
+        <label>
+          Phone Number <span style={requiredStyle}>*</span>
+        </label>
         <input
           name="phone"
           placeholder="Phone Number"
           onChange={handleChange}
         />
+
+        <label>
+          Password <span style={requiredStyle}>*</span>
+        </label>
         <input
           name="password"
           type="password"
@@ -89,6 +124,9 @@ const Signup = ({ onSignupSuccess }) => {
           onChange={handleChange}
         />
 
+        <label>
+          Skill Category <span style={requiredStyle}>*</span>
+        </label>
         <select name="category" onChange={handleChange}>
           <option value="">Select Skill Category</option>
           <option>Computer Science</option>
@@ -97,13 +135,21 @@ const Signup = ({ onSignupSuccess }) => {
           <option>Business</option>
         </select>
 
+        <label>
+          You are a <span style={requiredStyle}>*</span>
+        </label>
         <select name="role" onChange={handleChange}>
-          <option value="">You are a</option>
+          <option value="">Select Role</option>
           <option>Student</option>
           <option>Freelancer</option>
           <option>Professional</option>
           <option>Other</option>
         </select>
+
+        <label>
+          Why did you join this platform?
+          <span style={requiredStyle}>*</span>
+        </label>
 
         <textarea
           name="reason"
@@ -111,7 +157,21 @@ const Signup = ({ onSignupSuccess }) => {
           onChange={handleChange}
         />
 
-        <button type="submit">Create Account</button>
+        <button
+          type="submit"
+          style={{
+            background: "#0f172a",
+            color: "#fff",
+            border: "none",
+            padding: "12px",
+            borderRadius: "10px",
+            fontWeight: "600",
+            cursor: "pointer",
+            marginTop: "10px",
+          }}
+        >
+          Create Account
+        </button>
       </form>
     </div>
   );
